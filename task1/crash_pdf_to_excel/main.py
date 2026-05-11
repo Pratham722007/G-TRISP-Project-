@@ -8,6 +8,7 @@ def main():
     parser = argparse.ArgumentParser(description="Convert Indian Police Crash Report PDFs to Structured Excel.")
     parser.add_argument("--input", required=True, help="Path to a PDF file or a directory containing PDFs.")
     parser.add_argument("--output", help="Path to the output Excel file (default: output/crash_data.xlsx).")
+    parser.add_argument("--limit", type=int, help="Maximum number of PDF files to process.")
     
     args = parser.parse_args()
     
@@ -26,13 +27,16 @@ def main():
             print(f"Error: {input_path} is not a PDF file.")
             sys.exit(1)
     elif input_path.is_dir():
-        pdf_files = list(input_path.rglob("*.pdf"))
+        pdf_files = sorted(list(input_path.rglob("*.pdf")))
         if not pdf_files:
             print(f"Error: No PDF files found in {input_path}.")
             sys.exit(1)
     else:
         print(f"Error: Input path {input_path} does not exist.")
         sys.exit(1)
+
+    if args.limit and args.limit > 0:
+        pdf_files = pdf_files[:args.limit]
 
     print(f"Found {len(pdf_files)} PDF(s) to process.")
 
