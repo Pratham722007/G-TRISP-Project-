@@ -18,7 +18,7 @@ def main():
     else:
         output_path = Path("output/crash_data.xlsx")
 
-    # Resolve PDFs to process
+ 
     pdf_files = []
     if input_path.is_file():
         if input_path.suffix.lower() == ".pdf":
@@ -46,11 +46,11 @@ def main():
     for pdf_file in pdf_files:
         print(f"Processing: {pdf_file.name}")
         data = extractor.extract_from_pdf(pdf_file)
-        # Always add the filename for reference
+     
         data["Filename"] = pdf_file.name
         all_data.append(data)
 
-    # Reorder keys to put Filename first
+    
     if all_data:
         processed_data = []
         for entry in all_data:

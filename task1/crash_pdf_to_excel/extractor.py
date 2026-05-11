@@ -9,9 +9,9 @@ class CrashExtractor:
     """
 
     def __init__(self):
-        # Mapping of internal keys to possible labels in the PDF
+       
         self.field_map = {
-            # Section 1 – Accident Summary
+        
             "Accident_ID": ["Accident ID", "Accident_ID"],
             "FIR_CSR_Number": ["FIR/CSR Number", "FIR Number", "CSR Number"],
             "FIR_Date_Time": ["FIR Date & Time", "FIR Date Time", "Date and Time of FIR"],
@@ -25,7 +25,7 @@ class CrashExtractor:
             "District_Code": ["District Code", "District_Code"],
             "District_Name": ["District Name", "District_Name"],
 
-            # Section 2 – Accident Details
+        
             "Accident_Date_Time": ["Accident Date & Time", "Date and Time of Accident"],
             "Reporting_Date_Time": ["Reporting Date & Time", "Date and Time of Reporting"],
             "Landmark_Name": ["Landmark Name", "Landmark"],
@@ -47,7 +47,7 @@ class CrashExtractor:
             "Approx_Damage_Value": ["Approx. Damage Value", "Damage Value"],
             "No_of_Vehicles_Involved": ["No. of Vehicles Involved", "Vehicles Involved"],
 
-            # Section 4 – Vehicle Details
+     
             "Vehicle_Reg_No": ["Vehicle Reg No", "Registration Number"],
             "Vehicle_Category": ["Vehicle Category"],
             "Vehicle_Type": ["Vehicle Type"],
@@ -68,7 +68,7 @@ class CrashExtractor:
             "Hit_and_Run": ["Hit and Run"],
             "Owner_Name": ["Owner Name"],
 
-            # Section 5 – Driver Details
+          
             "Driver_Name": ["Driver Name"],
             "Driver_Age": ["Driver Age"],
             "Driver_Gender": ["Driver Gender"],
@@ -85,7 +85,7 @@ class CrashExtractor:
             "Driver_Severity": ["Driver Severity"],
             "Blood_Group": ["Blood Group"],
 
-            # Section 6 – Road Details
+           
             "Area_Type": ["Area Type"],
             "Road_Owning_Agency": ["Road Owning Agency"],
             "Road_Surface_Type": ["Road Surface Type"],
@@ -107,7 +107,7 @@ class CrashExtractor:
         Extracts all required fields from a single PDF file.
         """
         data = {field: "" for field in self.field_map}
-        # Initialize Section 3 fields (Persons Involved)
+       
         person_fields = [
             "Killed_Driver", "Killed_Passenger", "Killed_Pedestrian", "Killed_Total",
             "Grievous_Injury_Total", "Minor_Injury_Total", "No_Injury_Total", "Total_Persons"
@@ -125,15 +125,15 @@ class CrashExtractor:
                 
                 lines = full_text.splitlines()
                 
-                # 1. Parse standard fields (Label : Value)
+             
                 self._parse_label_value_fields(lines, data)
                 
-                # 2. Parse Persons Involved table
+        
                 self._parse_persons_table(lines, data)
 
         except Exception as e:
             print(f"  Warning: Error processing {pdf_path.name}: {e}")
-            # The dictionary is already initialized with empty strings
+           
         
         return data
 
@@ -142,23 +142,19 @@ class CrashExtractor:
         Scans lines for Label : Value patterns.
         """
         for line in lines:
-            # Common pattern is "Label : Value" or "Label: Value" or "Label Value"
-            # We'll check for " : " or ":" first
+           
             if ":" in line:
                 parts = line.split(":", 1)
                 label_candidate = parts[0].strip()
                 value_candidate = parts[1].strip()
                 
-                # Check which field this label maps to
+                
                 for field_key, labels in self.field_map.items():
                     if any(label.lower() in label_candidate.lower() for label in labels):
-                        # If multiple fields match, we take the best one or append? 
-                        # Usually, one line has one field.
-                        if not data[field_key]: # Only fill if empty
+                        
+                        if not data[field_key]: 
                             data[field_key] = value_candidate
             else:
-                # Handle "Label Value" patterns if needed, but "Label : Value" is more common
-                # We can try to match labels directly at the start of the line
                 for field_key, labels in self.field_map.items():
                     if data[field_key]: continue
                     for label in labels:
@@ -174,14 +170,13 @@ class CrashExtractor:
         Table usually has rows for Driver, Passenger, Pedestrian, Total.
         And columns for Killed, Grievous Injury, Minor Injury, No Injury, Total.
         """
-        # We look for rows starting with specific keywords
+
         keywords = ["Driver", "Passenger", "Pedestrian", "Total"]
         
         for line in lines:
             parts = line.split()
             if not parts: continue
-            
-            # Identify row
+
             row_type = None
             for kw in keywords:
                 if kw.lower() == parts[0].lower().rstrip(':'):
@@ -189,11 +184,11 @@ class CrashExtractor:
                     break
             
             if row_type:
-                # Extract numbers from the line
+               
                 numbers = re.findall(r'\d+', line)
                 if not numbers: continue
                 
-                # Assuming order: Killed, Grievous, Minor, No Injury, Total
+                
                 if row_type == "Driver" and len(numbers) >= 1:
                     data["Killed_Driver"] = numbers[0]
                 elif row_type == "Passenger" and len(numbers) >= 1:

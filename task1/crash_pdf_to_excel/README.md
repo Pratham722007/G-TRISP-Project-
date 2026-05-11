@@ -1,48 +1,48 @@
 # Crash PDF to Excel Conversion Tool
 
 ## Overview
-This tool is a self-contained Python utility designed to convert Indian police crash report PDFs (specifically the SVNIT format) into a single, structured Excel file. Each PDF report is converted into one row in the Excel sheet, with extracted fields mapped to corresponding columns.
+This tool automates the extraction of structured data from Indian Police crash report PDFs (SVNIT format) into a formatted Excel file. It supports single-file processing, batch processing, and intelligent data appending.
+
+## Tech Stack
+- **Python 3.9+**
+- **pdfplumber**: PDF text extraction.
+- **openpyxl**: Excel generation, styling, and appending.
+- **argparse**: CLI interface.
 
 ## Installation
-1. Ensure you have Python 3.9+ installed.
-2. Install the required dependencies using pip:
-   ```bash
-   pip install -r requirements.txt
+1. Ensure you have Python installed.
+2. Activate your virtual environment:
+   ```powershell
+   .venv\Scripts\Activate.ps1
+   ```
+3. Install dependencies:
+   ```powershell
+   pip install -r task1/crash_pdf_to_excel/requirements.txt
    ```
 
 ## Usage
-The tool can process a single PDF file or a folder containing multiple PDFs.
 
 ### Process a single PDF:
-```bash
-python main.py --input reports/crash1.pdf
+```powershell
+python task1/crash_pdf_to_excel/main.py --input "path/to/report.pdf"
 ```
 
 ### Process all PDFs in a folder:
-```bash
-python main.py --input reports/
+```powershell
+python task1/crash_pdf_to_excel/main.py --input "path/to/folder/"
 ```
 
-### Specify a custom output path:
-```bash
-python main.py --input reports/ --output results/crash_data.xlsx
+### Process a limited number of files:
+```powershell
+python task1/crash_pdf_to_excel/main.py --input "path/to/folder/" --limit 5
 ```
 
-## Output Format
-The tool generates an Excel file (`.xlsx`) with the following characteristics:
-- **Sheet Name**: `Crash_Data`
-- **Header Row**: Bold, white font on a dark blue background (#1F4E79).
-- **Freezing**: The top header row is frozen for easy scrolling.
-- **Auto-sizing**: Column widths are automatically adjusted based on content (capped at 40 characters).
-- **Columns**: Organized by sections including Accident Summary, Accident Details, Persons Involved, Vehicle Details, Driver Details, and Road Details.
+### Specify a custom output:
+```powershell
+python task1/crash_pdf_to_excel/main.py --input "path/to/folder/" --output "results/my_data.xlsx"
+```
 
-## How It Works
-1. **Extraction**: Uses `pdfplumber` to extract raw text from all pages of the PDF.
-2. **Parsing**: A regex and keyword-based parser scans the text for `Label : Value` patterns. It uses a flexible mapping to handle common variations in field labels.
-3. **Table Processing**: Specifically detects the "Persons Involved" table to extract numeric counts for Killed and Injured categories.
-4. **Export**: Uses `openpyxl` to construct the structured Excel file with the requested styling and layout.
-
-## Limitations
-- **Scanned PDFs**: This tool is designed for text-based PDFs. Scanned or image-based PDFs (which require OCR) are not supported in this version.
-- **Field Variations**: If a PDF uses a significantly different format or labels not included in the mapping, some fields may appear blank.
-- **Table Structure**: The persons table extraction assumes a standard layout (Driver, Passenger, Pedestrian, Total rows).
+## Features
+- **Smart Append**: Automatically detects if the output file exists and adds new records as new rows at the bottom.
+- **Rich Formatting**: Headers are styled with colors, columns are auto-resized, and the top row is frozen.
+- **Batch Processing**: Easily process hundreds of PDFs with a single command.
